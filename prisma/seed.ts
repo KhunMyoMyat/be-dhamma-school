@@ -6,6 +6,19 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding Dhamma School database...');
 
+  // Clear existing data
+  await prisma.donation.deleteMany();
+  await prisma.teaching.deleteMany();
+  await prisma.course.deleteMany();
+  await prisma.event.deleteMany();
+  await prisma.teacher.deleteMany();
+  await prisma.contactInquiry.deleteMany();
+  // We keep the admin user for stability or can delete it too
+  // await prisma.user.deleteMany();
+
+  console.log('🧹 Database cleared. Starting fresh seed...');
+
+
   // Create admin user
   const hashedPassword = await bcrypt.hash('admin123', 10);
   await prisma.user.upsert({
@@ -26,7 +39,7 @@ async function main() {
       nameMm: 'အရှင်ဦးပဏ္ဍိတ',
       bio: 'A renowned meditation master with over 40 years of teaching experience in Vipassana meditation. Known for his strict but compassionate approach to Buddhist practice.',
       bioMm: 'ဝိပဿနာတရားအားထုတ်ခြင်းတွင် နှစ်ပေါင်း ၄၀ ကျော် သင်ကြားပို့ချ‌ခံရသော ကျော်ကြားသည့် တရားအကျင့်ဆရာတစ်ပါး ဖြစ်ပါသည်။',
-      image: '/images/teachers/teacher1.jpg',
+      image: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?q=80&w=1000',
       title: 'Head Teacher',
     },
   });
@@ -37,7 +50,7 @@ async function main() {
       nameMm: 'ဆရာလေး ဒေါ်ခေမိန္ဒာ',
       bio: 'Specializing in Abhidhamma studies and Pali language instruction. Dedicated to making ancient Buddhist texts accessible to modern learners.',
       bioMm: 'အဘိဓမ္မာ နှင့် ပါဠိဘာသာ သင်ကြားရေးတွင် အထူးပြုသည်။ ရှေးဟောင်း ဗုဒ္ဓစာပေများကို ခေတ်သစ်ပညာသင်ယူသူများ လက်လှမ်းမီစေရန် ဆောင်ရွက်သည်။',
-      image: '/images/teachers/teacher2.jpg',
+      image: 'https://images.unsplash.com/photo-1548013146-72479768bbaa?q=80&w=1000',
       title: 'Abhidhamma Instructor',
     },
   });
@@ -48,7 +61,7 @@ async function main() {
       nameMm: 'ဦးဉာဏိဿရ',
       bio: 'Young and dynamic teacher focusing on bringing Dhamma to the youth. Expert in Sutta studies and modern Buddhist ethics.',
       bioMm: 'လူငယ်များထံသို့ ဓမ္မကို ယူဆောင်ပေးရေးတွင် အာရုံစိုက်သော လူငယ်ဆရာတစ်ပါးဖြစ်သည်။',
-      image: '/images/teachers/teacher3.jpg',
+      image: 'https://images.unsplash.com/photo-1528642463366-20ba5f3e72dc?q=80&w=1000',
       title: 'Sutta Studies Teacher',
     },
   });
@@ -65,6 +78,7 @@ async function main() {
         duration: '8 weeks',
         schedule: 'Every Saturday 6:00 AM - 8:00 AM',
         teacherId: teacher1.id,
+        image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=1000',
       },
       {
         title: 'Abhidhamma Studies - Level 1',
@@ -75,6 +89,7 @@ async function main() {
         duration: '12 weeks',
         schedule: 'Every Sunday 9:00 AM - 11:00 AM',
         teacherId: teacher2.id,
+        image: 'https://images.unsplash.com/photo-1533519107127-143d4f3fed18?q=80&w=1000',
       },
       {
         title: 'Pali Language for Beginners',
@@ -85,6 +100,7 @@ async function main() {
         duration: '16 weeks',
         schedule: 'Every Wednesday 5:00 PM - 7:00 PM',
         teacherId: teacher2.id,
+        image: 'https://images.unsplash.com/photo-1590059235ef9-7be853ec039f?q=80&w=1000',
       },
       {
         title: 'Buddhist Ethics in Modern Life',
@@ -95,6 +111,7 @@ async function main() {
         duration: '6 weeks',
         schedule: 'Every Friday 6:00 PM - 7:30 PM',
         teacherId: teacher3.id,
+        image: 'https://images.unsplash.com/photo-1507692049790-de58290a4334?q=80&w=1000',
       },
       {
         title: 'Advanced Meditation Retreat Preparation',
@@ -105,6 +122,7 @@ async function main() {
         duration: '4 weeks',
         schedule: 'Every Saturday 4:00 AM - 7:00 AM',
         teacherId: teacher1.id,
+        image: 'https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?q=80&w=1000',
       },
       {
         title: 'Sutta Study Circle',
@@ -115,6 +133,7 @@ async function main() {
         duration: 'Ongoing',
         schedule: 'Every Thursday 6:00 PM - 8:00 PM',
         teacherId: teacher3.id,
+        image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1000',
       },
     ],
   });
@@ -130,7 +149,7 @@ async function main() {
         descriptionMm: 'ဗုဒ္ဓ၏ ဖွား‌တော်မူ၊ ဘုရားဖြစ်တော်မူ၊ ပရိနိဗ္ဗာန်စံတော်မူခြင်းတို့ကို ဂုဏ်ပြုသော ဗုဒ္ဓဘာသာပြက္ခဒိန်တွင် အမြင့်မြတ်ဆုံးနေ့တွင် ပါဝင်ပါ။',
         date: new Date(now.getFullYear(), now.getMonth() + 1, 15),
         location: 'Main Prayer Hall',
-        image: '/images/events/vesak.jpg',
+        image: 'https://images.unsplash.com/photo-1549130030-94fa9150ea4c?q=80&w=1000',
       },
       {
         title: '7-Day Meditation Retreat',
@@ -140,7 +159,7 @@ async function main() {
         date: new Date(now.getFullYear(), now.getMonth() + 2, 1),
         endDate: new Date(now.getFullYear(), now.getMonth() + 2, 7),
         location: 'Meditation Center',
-        image: '/images/events/retreat.jpg',
+        image: 'https://images.unsplash.com/photo-1517400030504-2453e925b449?q=80&w=1000',
       },
       {
         title: 'Weekly Dhamma Talk',
@@ -149,7 +168,7 @@ async function main() {
         descriptionMm: 'အားလုံးအတွက် ပွင့်လင်းသော ပုံမှန်အပတ်စဥ် ဓမ္မတရားပွဲ ဖြစ်ပါသည်။',
         date: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7),
         location: 'Dhamma Hall',
-        image: '/images/events/dhamma-talk.jpg',
+        image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1000',
       },
       {
         title: 'Kathina Robe Offering Ceremony',
@@ -158,7 +177,7 @@ async function main() {
         descriptionMm: 'သံဃာတော်များအား သင်္ကန်းနှင့် လိုအပ်ပစ္စည်းများကို လှူဒါန်းရန် အသင်းအဖွဲ့ စုစည်းသော နှစ်စဉ် ကထိန်အခမ်းအနား ဖြစ်ပါသည်။',
         date: new Date(now.getFullYear(), now.getMonth() + 3, 20),
         location: 'Main Monastery',
-        image: '/images/events/kathina.jpg',
+        image: 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?q=80&w=1000',
       },
     ],
   });
