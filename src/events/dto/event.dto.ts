@@ -1,4 +1,5 @@
 import { IsString, IsOptional, IsBoolean, IsDateString } from 'class-validator';
+import { PaginationDto } from '../../common/dto';
 
 export class CreateEventDto {
   @IsString()
@@ -30,6 +31,27 @@ export class CreateEventDto {
   @IsOptional()
   @IsString()
   image?: string;
+
+  @IsOptional()
+  @IsString()
+  mainSponsor?: string;
+
+  @IsOptional()
+  @IsString()
+  mainSponsorMm?: string;
+
+  @IsOptional()
+  coSponsors?: any[];
+}
+
+export class QueryEventDto extends PaginationDto {
+  @IsOptional()
+  @IsDateString()
+  startDate?: string;
+
+  @IsOptional()
+  @IsDateString()
+  endDate?: string;
 }
 
 export class UpdateEventDto {
@@ -64,6 +86,17 @@ export class UpdateEventDto {
   @IsOptional()
   @IsString()
   image?: string;
+
+  @IsOptional()
+  @IsString()
+  mainSponsor?: string;
+
+  @IsOptional()
+  @IsString()
+  mainSponsorMm?: string;
+
+  @IsOptional()
+  coSponsors?: any[];
 
   @IsOptional()
   @IsBoolean()

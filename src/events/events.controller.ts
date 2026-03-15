@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { EventsService } from './events.service';
-import { CreateEventDto, UpdateEventDto } from './dto/event.dto';
+import { CreateEventDto, UpdateEventDto, QueryEventDto } from './dto/event.dto';
 import { PaginationDto } from '../common/dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
@@ -9,13 +9,18 @@ export class EventsController {
   constructor(private eventsService: EventsService) {}
 
   @Get()
-  findAll(@Query() query: PaginationDto) {
+  findAll(@Query() query: QueryEventDto) {
     return this.eventsService.findAll(query);
   }
 
   @Get('upcoming')
   findUpcoming() {
     return this.eventsService.findUpcoming();
+  }
+
+  @Get('past')
+  findPast(@Query() query: QueryEventDto) {
+    return this.eventsService.findPast(query);
   }
 
   @Get(':id')

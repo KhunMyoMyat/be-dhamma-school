@@ -68,6 +68,9 @@ model Event {
   endDate       DateTime? @map("end_date")
   location      String?
   image         String?
+  mainSponsor   String?   @map("main_sponsor")
+  mainSponsorMm String?   @map("main_sponsor_mm")
+  coSponsors    Json?     @map("co_sponsors") // Array of { name: string, nameMm: string }
   isActive      Boolean   @default(true) @map("is_active")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
