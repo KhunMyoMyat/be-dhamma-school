@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsBoolean } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsDateString, IsArray, IsInt, IsNumber } from 'class-validator';
 
 export class CreateCourseDto {
   @IsString()
@@ -28,12 +28,33 @@ export class CreateCourseDto {
   duration?: string;
 
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  daysOfWeek?: string[];
+
+  @IsOptional()
+  @IsString()
+  classTime?: string;
+
+  @IsOptional()
+  @IsInt()
+  daysPerWeek?: number;
+
+  @IsOptional()
   @IsString()
   schedule?: string;
 
   @IsOptional()
   @IsString()
   teacherId?: string;
+
+  @IsOptional()
+  @IsDateString()
+  startDate?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
 }
 
 export class UpdateCourseDto {
@@ -66,12 +87,29 @@ export class UpdateCourseDto {
   duration?: string;
 
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  daysOfWeek?: string[];
+
+  @IsOptional()
+  @IsString()
+  classTime?: string;
+
+  @IsOptional()
+  @IsInt()
+  daysPerWeek?: number;
+
+  @IsOptional()
   @IsString()
   schedule?: string;
 
   @IsOptional()
   @IsString()
   teacherId?: string;
+
+  @IsOptional()
+  @IsDateString()
+  startDate?: string;
 
   @IsOptional()
   @IsBoolean()
