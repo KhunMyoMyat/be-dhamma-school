@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Course {
+  id            String   @id @default(uuid())
+  title         String
+  titleMm       String?  @map("title_mm")
+  description   String
+  descriptionMm String?  @map("description_mm")
+  image         String?
+  level         String   @default("beginner")
+  duration      String?
+  schedule      String?
+  teacherId     String?  @map("teacher_id")
+  teacher       Teacher? @relation(fields: [teacherId], references: [id])
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("courses")
+}
+
+model Teacher {
+  id        String     @id @default(uuid())
+  name      String
+  nameMm    String?    @map("name_mm")
+  bio       String?
+  bioMm     String?    @map("bio_mm")
+  image     String?
+  title     String?
+  courses   Course[]
+  teachings Teaching[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("teachers")
+}
+
+model Event {
+  id            String    @id @default(uuid())
+  title         String
+  titleMm       String?   @map("title_mm")
+  description   String?
+  descriptionMm String?   @map("description_mm")
+  date          DateTime
+  endDate       DateTime? @map("end_date")
+  location      String?
+  image         String?
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("events")
+}
+
+model Teaching {
+  id          String   @id @default(uuid())
+  title       String
+  titleMm     String?  @map("title_mm")
+  content     String?
+  contentMm   String?  @map("content_mm")
+  category    String   @default("dhamma")
+  audioUrl    String?  @map("audio_url")
+  videoUrl    String?  @map("video_url")
+  teacherId   String?  @map("teacher_id")
+  teacher     Teacher? @relation(fields: [teacherId], references: [id])
+  isPublished Boolean  @default(true) @map("is_published")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("teachings")
+}
+
+model Donation {
+  id        String   @id @default(uuid())
+  donorName String   @map("donor_name")
+  amount    Float
+  currency  String   @default("MMK")
+  message   String?
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("donations")
+}
+
+model ContactInquiry {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("contact_inquiries")
+}
+
+enum Role {
+  ADMIN
+  SUPER_ADMIN
+}
