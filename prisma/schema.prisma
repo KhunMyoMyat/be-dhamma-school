@@ -80,20 +80,41 @@ model Event {
 
 model Teaching {
   id          String   @id @default(uuid())
-  title       String
+  title       String?
   titleMm     String?  @map("title_mm")
   content     String?
   contentMm   String?  @map("content_mm")
   category    String   @default("dhamma")
   audioUrl    String?  @map("audio_url")
   videoUrl    String?  @map("video_url")
+  documentUrl  String? @map("document_url")
+  documentName String? @map("document_name")
+  documentType String? @map("document_type")
+  documentSize Int?    @map("document_size")
   teacherId   String?  @map("teacher_id")
   teacher     Teacher? @relation(fields: [teacherId], references: [id])
+  translations TeachingTranslation[]
   isPublished Boolean  @default(true) @map("is_published")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@map("teachings")
+}
+
+model TeachingTranslation {
+  id         String   @id @default(uuid())
+  teachingId String   @map("teaching_id")
+  locale     String
+  title      String
+  content    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  teaching   Teaching @relation(fields: [teachingId], references: [id], onDelete: Cascade)
+
+  @@unique([teachingId, locale])
+  @@index([locale])
+  @@map("teaching_translations")
 }
 
 model Donation {
