@@ -27,6 +27,10 @@ export class CreateTeachingDto {
 
   @IsOptional()
   @IsString()
+  coverImageUrl?: string;
+
+  @IsOptional()
+  @IsString()
   audioUrl?: string;
 
   @IsOptional()
@@ -69,6 +73,10 @@ export class UpdateTeachingDto {
   @IsOptional()
   @IsString()
   category?: string;
+
+  @IsOptional()
+  @IsString()
+  coverImageUrl?: string;
 
   @IsOptional()
   @IsString()

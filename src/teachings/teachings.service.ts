@@ -65,6 +65,7 @@ export class TeachingsService {
     return this.prisma.teaching.create({
       data: {
         category: dto.category,
+        coverImageUrl: dto.coverImageUrl,
         audioUrl: dto.audioUrl,
         videoUrl: dto.videoUrl,
         documentUrl: dto.documentUrl,
@@ -84,6 +85,7 @@ export class TeachingsService {
   async update(id: string, dto: UpdateTeachingDto) {
     const updates = {
       category: dto.category,
+      coverImageUrl: dto.coverImageUrl,
       audioUrl: dto.audioUrl,
       videoUrl: dto.videoUrl,
       documentUrl: dto.documentUrl,

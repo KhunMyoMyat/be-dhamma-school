@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { existsSync } from 'fs';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { CoursesModule } from './courses/courses.module';
@@ -11,10 +12,17 @@ import { DonationsModule } from './donations/donations.module';
 import { ContactModule } from './contact/contact.module';
 import { UploadModule } from './upload/upload.module';
 
+function getUploadsRoot() {
+  const candidate = join(__dirname, '..', 'uploads');
+  if (existsSync(candidate)) return candidate;
+  // When compiled, __dirname is typically dist/src; uploads live at project root.
+  return join(__dirname, '..', '..', 'uploads');
+}
+
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
+      rootPath: getUploadsRoot(),
       serveRoot: '/uploads',
     }),
     PrismaModule,

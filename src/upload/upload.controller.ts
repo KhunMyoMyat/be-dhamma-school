@@ -1,8 +1,16 @@
 import { Controller, Post, UseInterceptors, UploadedFile, UseGuards } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { extname, join } from 'path';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { existsSync } from 'fs';
+
+function getUploadsRoot() {
+  const candidate = join(__dirname, '..', '..', 'uploads');
+  if (existsSync(candidate)) return candidate;
+  // When compiled, __dirname is typically dist/src/upload; uploads live at project root.
+  return join(__dirname, '..', '..', '..', 'uploads');
+}
 
 @Controller('upload')
 export class UploadController {
@@ -11,7 +19,7 @@ export class UploadController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads',
+        destination: getUploadsRoot(),
         filename: (_req, file, cb) => {
           const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
           cb(null, uniqueSuffix + extname(file.originalname));
@@ -39,7 +47,7 @@ export class UploadController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './uploads',
+        destination: getUploadsRoot(),
         filename: (_req, file, cb) => {
           const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
           cb(null, uniqueSuffix + extname(file.originalname));

@@ -85,6 +85,7 @@ model Teaching {
   content     String?
   contentMm   String?  @map("content_mm")
   category    String   @default("dhamma")
+  coverImageUrl String? @map("cover_image_url")
   audioUrl    String?  @map("audio_url")
   videoUrl    String?  @map("video_url")
   documentUrl  String? @map("document_url")
