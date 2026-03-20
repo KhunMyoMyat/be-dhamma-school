@@ -4,6 +4,8 @@ import { CreateDonationDto } from './dto/donation.dto';
 import { PaginationDto } from '../common/dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { MonthlyDonorsQueryDto } from './dto/monthly-donors.dto';
+import { CreateMonthlyDonorDto, UpdateMonthlyDonorDto } from './dto/monthly-donor-subscription.dto';
+import { Put, Delete, Param } from '@nestjs/common';
 
 @Controller('donations')
 export class DonationsController {
@@ -28,5 +30,30 @@ export class DonationsController {
   @Get('monthly-donors')
   getMonthlyDonors(@Query() query: MonthlyDonorsQueryDto) {
     return this.donationsService.getMonthlyDonors(query);
+  }
+
+  // --- Monthly Donor Subscriptions ---
+
+  @Post('monthly-donor-subscriptions')
+  registerMonthlyDonor(@Body() dto: CreateMonthlyDonorDto) {
+    return this.donationsService.registerMonthlyDonor(dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('monthly-donor-subscriptions')
+  findAllMonthlyDonors(@Query() query: PaginationDto) {
+    return this.donationsService.findAllMonthlyDonors(query);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('monthly-donor-subscriptions/:id')
+  updateMonthlyDonor(@Param('id') id: string, @Body() dto: UpdateMonthlyDonorDto) {
+    return this.donationsService.updateMonthlyDonor(id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('monthly-donor-subscriptions/:id')
+  deleteMonthlyDonor(@Param('id') id: string) {
+    return this.donationsService.deleteMonthlyDonor(id);
   }
 }

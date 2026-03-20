@@ -3,6 +3,7 @@ import { PrismaService } from '../common/prisma/prisma.service';
 import { PaginationDto, createPaginatedResponse } from '../common/dto';
 import { CreateDonationDto } from './dto/donation.dto';
 import { MonthlyDonorsQueryDto } from './dto/monthly-donors.dto';
+import { CreateMonthlyDonorDto, UpdateMonthlyDonorDto } from './dto/monthly-donor-subscription.dto';
 
 @Injectable()
 export class DonationsService {
@@ -95,5 +96,59 @@ export class DonationsService {
     }));
 
     return createPaginatedResponse(data, allGroups.length, page, limit);
+  }
+
+  // --- Monthly Donor (Subscriptions) ---
+
+  async registerMonthlyDonor(dto: CreateMonthlyDonorDto) {
+    return this.prisma.monthlyDonor.create({
+      data: {
+        ...dto,
+        startDate: new Date(dto.startDate),
+      },
+    });
+  }
+
+  async findAllMonthlyDonors(query: PaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    const skip = (page - 1) * limit;
+    const search = query.search?.trim();
+
+    const where = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' as const } },
+            { phone: { contains: search, mode: 'insensitive' as const } },
+            { remarks: { contains: search, mode: 'insensitive' as const } },
+          ],
+        }
+      : undefined;
+
+    const [data, total] = await Promise.all([
+      this.prisma.monthlyDonor.findMany({
+        skip,
+        take: limit,
+        where,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.monthlyDonor.count({ where }),
+    ]);
+
+    return createPaginatedResponse(data, total, page, limit);
+  }
+
+  async updateMonthlyDonor(id: string, dto: UpdateMonthlyDonorDto) {
+    const data: any = { ...dto };
+    if (dto.startDate) {
+      data.startDate = new Date(dto.startDate);
+    }
+    return this.prisma.monthlyDonor.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async deleteMonthlyDonor(id: string) {
+    return this.prisma.monthlyDonor.delete({ where: { id } });
   }
 }
