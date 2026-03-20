@@ -123,6 +123,7 @@ model Donation {
   donorName String   @map("donor_name")
   amount    Float
   currency  String   @default("MMK")
+  category  String   @default("general")
   message   String?
   date      DateTime @default(now())
   createdAt DateTime @default(now())
@@ -137,6 +138,7 @@ model MonthlyDonor {
   phone       String?
   amount      Float
   currency    String   @default("MMK")
+  category    String   @default("general")
   startDate   DateTime @map("start_date")
   status      String   @default("pending") // pending, active, inactive
   remarks     String?

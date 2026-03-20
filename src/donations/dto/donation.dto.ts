@@ -13,5 +13,9 @@ export class CreateDonationDto {
 
   @IsOptional()
   @IsString()
+  category?: string;
+
+  @IsOptional()
+  @IsString()
   message?: string;
 }

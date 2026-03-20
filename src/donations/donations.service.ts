@@ -10,31 +10,48 @@ export class DonationsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(query: PaginationDto) {
-    const { page = 1, limit = 10 } = query;
+    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'desc', category, search: searchRaw } = query;
     const skip = (page - 1) * limit;
-    const search = query.search?.trim();
+    const search = searchRaw?.trim();
 
-    const where = search
-      ? {
-          OR: [
-            { donorName: { contains: search, mode: 'insensitive' as const } },
-            { currency: { contains: search, mode: 'insensitive' as const } },
-            { message: { contains: search, mode: 'insensitive' as const } },
-          ],
-        }
-      : undefined;
+    const where: any = {};
+    if (search) {
+      where.OR = [
+        { donorName: { contains: search, mode: 'insensitive' as const } },
+        { currency: { contains: search, mode: 'insensitive' as const } },
+        { message: { contains: search, mode: 'insensitive' as const } },
+      ];
+    }
+    if (category) {
+      where.category = category;
+    }
 
-    const [data, total] = await Promise.all([
+    const [data, total, totalsByCurrencyAgg] = await Promise.all([
       this.prisma.donation.findMany({
         skip,
         take: limit,
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { [sortBy]: sortOrder },
       }),
       this.prisma.donation.count({ where }),
+      this.prisma.donation.groupBy({
+        by: ['currency'],
+        where,
+        _sum: { amount: true },
+      }),
     ]);
 
-    return createPaginatedResponse(data, total, page, limit);
+    const res = createPaginatedResponse(data, total, page, limit);
+    return {
+      ...res,
+      meta: {
+        ...res.meta,
+        totalsByCurrency: totalsByCurrencyAgg.map(t => ({
+          currency: t.currency,
+          total: t._sum.amount || 0
+        })),
+      },
+    };
   }
 
   async create(dto: CreateDonationDto) {
@@ -70,7 +87,7 @@ export class DonationsService {
       },
     } as const;
 
-    const [groups, allGroups] = await Promise.all([
+    const [groups, allGroups, totalsByCurrencyAgg] = await Promise.all([
       this.prisma.donation.groupBy({
         by: ['donorName', 'currency'],
         where,
@@ -85,6 +102,11 @@ export class DonationsService {
         by: ['donorName', 'currency'],
         where,
       }),
+      this.prisma.donation.groupBy({
+        by: ['currency'],
+        where,
+        _sum: { amount: true },
+      }),
     ]);
 
     const data = groups.map((g) => ({
@@ -95,7 +117,17 @@ export class DonationsService {
       lastDonationAt: g._max.date,
     }));
 
-    return createPaginatedResponse(data, allGroups.length, page, limit);
+    const res = createPaginatedResponse(data, allGroups.length, page, limit);
+    return {
+      ...res,
+      meta: {
+        ...res.meta,
+        totalsByCurrency: totalsByCurrencyAgg.map(t => ({
+          currency: t.currency,
+          total: t._sum.amount || 0
+        })),
+      },
+    };
   }
 
   // --- Monthly Donor (Subscriptions) ---
@@ -110,31 +142,48 @@ export class DonationsService {
   }
 
   async findAllMonthlyDonors(query: PaginationDto) {
-    const { page = 1, limit = 10 } = query;
+    const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'desc', category, search: searchRaw } = query;
     const skip = (page - 1) * limit;
-    const search = query.search?.trim();
+    const search = searchRaw?.trim();
 
-    const where = search
-      ? {
-          OR: [
-            { name: { contains: search, mode: 'insensitive' as const } },
-            { phone: { contains: search, mode: 'insensitive' as const } },
-            { remarks: { contains: search, mode: 'insensitive' as const } },
-          ],
-        }
-      : undefined;
+    const where: any = {};
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' as const } },
+        { phone: { contains: search, mode: 'insensitive' as const } },
+        { remarks: { contains: search, mode: 'insensitive' as const } },
+      ];
+    }
+    if (category) {
+      where.category = category;
+    }
 
-    const [data, total] = await Promise.all([
+    const [data, total, totalsByCurrencyAgg] = await Promise.all([
       this.prisma.monthlyDonor.findMany({
         skip,
         take: limit,
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { [sortBy]: sortOrder },
       }),
       this.prisma.monthlyDonor.count({ where }),
+      this.prisma.monthlyDonor.groupBy({
+        by: ['currency'],
+        where,
+        _sum: { amount: true },
+      }),
     ]);
 
-    return createPaginatedResponse(data, total, page, limit);
+    const res = createPaginatedResponse(data, total, page, limit);
+    return {
+      ...res,
+      meta: {
+        ...res.meta,
+        totalsByCurrency: totalsByCurrencyAgg.map(t => ({
+          currency: t.currency,
+          total: t._sum.amount || 0
+        })),
+      },
+    };
   }
 
   async updateMonthlyDonor(id: string, dto: UpdateMonthlyDonorDto) {

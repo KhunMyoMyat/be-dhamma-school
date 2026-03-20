@@ -16,6 +16,15 @@ export class PaginationDto {
 
   @IsOptional()
   search?: string;
+
+  @IsOptional()
+  sortBy?: string;
+
+  @IsOptional()
+  sortOrder?: 'asc' | 'desc';
+
+  @IsOptional()
+  category?: string;
 }
 
 export interface PaginatedResponse<T> {
