@@ -3,6 +3,7 @@ import { DonationsService } from './donations.service';
 import { CreateDonationDto } from './dto/donation.dto';
 import { PaginationDto } from '../common/dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { MonthlyDonorsQueryDto } from './dto/monthly-donors.dto';
 
 @Controller('donations')
 export class DonationsController {
@@ -22,5 +23,10 @@ export class DonationsController {
   @Get('stats')
   getStats() {
     return this.donationsService.getStats();
+  }
+
+  @Get('monthly-donors')
+  getMonthlyDonors(@Query() query: MonthlyDonorsQueryDto) {
+    return this.donationsService.getMonthlyDonors(query);
   }
 }

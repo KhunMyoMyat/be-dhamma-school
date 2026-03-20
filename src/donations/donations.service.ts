@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { PaginationDto, createPaginatedResponse } from '../common/dto';
 import { CreateDonationDto } from './dto/donation.dto';
+import { MonthlyDonorsQueryDto } from './dto/monthly-donors.dto';
 
 @Injectable()
 export class DonationsService {
@@ -10,14 +11,26 @@ export class DonationsService {
   async findAll(query: PaginationDto) {
     const { page = 1, limit = 10 } = query;
     const skip = (page - 1) * limit;
+    const search = query.search?.trim();
+
+    const where = search
+      ? {
+          OR: [
+            { donorName: { contains: search, mode: 'insensitive' as const } },
+            { currency: { contains: search, mode: 'insensitive' as const } },
+            { message: { contains: search, mode: 'insensitive' as const } },
+          ],
+        }
+      : undefined;
 
     const [data, total] = await Promise.all([
       this.prisma.donation.findMany({
         skip,
         take: limit,
+        where,
         orderBy: { createdAt: 'desc' },
       }),
-      this.prisma.donation.count(),
+      this.prisma.donation.count({ where }),
     ]);
 
     return createPaginatedResponse(data, total, page, limit);
@@ -36,5 +49,51 @@ export class DonationsService {
       totalDonations,
       totalAmount: totalAmount._sum.amount || 0,
     };
+  }
+
+  async getMonthlyDonors(query: MonthlyDonorsQueryDto) {
+    const now = new Date();
+    const year = query.year ?? now.getUTCFullYear();
+    const month = query.month ?? now.getUTCMonth() + 1; // 1-12
+
+    const { page = 1, limit = 50 } = query;
+    const skip = (page - 1) * limit;
+
+    const start = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0, 0));
+    const end = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0));
+
+    const where = {
+      date: {
+        gte: start,
+        lt: end,
+      },
+    } as const;
+
+    const [groups, allGroups] = await Promise.all([
+      this.prisma.donation.groupBy({
+        by: ['donorName', 'currency'],
+        where,
+        _sum: { amount: true },
+        _count: { _all: true },
+        _max: { date: true },
+        orderBy: [{ _sum: { amount: 'desc' } }, { donorName: 'asc' }],
+        skip,
+        take: limit,
+      }),
+      this.prisma.donation.groupBy({
+        by: ['donorName', 'currency'],
+        where,
+      }),
+    ]);
+
+    const data = groups.map((g) => ({
+      donorName: g.donorName,
+      currency: g.currency,
+      totalAmount: g._sum.amount ?? 0,
+      donationCount: g._count._all,
+      lastDonationAt: g._max.date,
+    }));
+
+    return createPaginatedResponse(data, allGroups.length, page, limit);
   }
 }
