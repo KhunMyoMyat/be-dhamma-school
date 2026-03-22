@@ -24,6 +24,16 @@ export class PaginationDto {
   sortOrder?: 'asc' | 'desc';
 
   @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  month?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  year?: number;
+
+  @IsOptional()
   category?: string;
 }
 
