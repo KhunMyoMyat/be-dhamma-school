@@ -8,16 +8,26 @@ export class ContactService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(query: PaginationDto) {
-    const { page = 1, limit = 10 } = query;
+    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'desc' } = query;
     const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' as const } },
+        { email: { contains: search, mode: 'insensitive' as const } },
+        { message: { contains: search, mode: 'insensitive' as const } },
+      ];
+    }
 
     const [data, total] = await Promise.all([
       this.prisma.contactInquiry.findMany({
+        where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { [sortBy]: sortOrder },
       }),
-      this.prisma.contactInquiry.count(),
+      this.prisma.contactInquiry.count({ where }),
     ]);
 
     return createPaginatedResponse(data, total, page, limit);

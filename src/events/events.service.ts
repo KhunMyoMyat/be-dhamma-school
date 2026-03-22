@@ -8,7 +8,7 @@ export class EventsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(query: QueryEventDto) {
-    const { page = 1, limit = 10, search } = query;
+    const { page = 1, limit = 10, search, sortBy = 'date', sortOrder = 'desc' } = query;
     const skip = (page - 1) * limit;
 
     const where: any = {};
@@ -34,7 +34,7 @@ export class EventsService {
         where,
         skip,
         take: limit,
-        orderBy: { date: 'desc' },
+        orderBy: { [sortBy]: sortOrder },
       }),
       this.prisma.event.count({ where }),
     ]);

@@ -8,7 +8,7 @@ export class TeachingsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(query: PaginationDto) {
-    const { page = 1, limit = 10, search } = query;
+    const { page = 1, limit = 10, search, sortBy = 'createdAt', sortOrder = 'desc' } = query;
     const skip = (page - 1) * limit;
 
     const where = search
@@ -30,7 +30,7 @@ export class TeachingsService {
         skip,
         take: limit,
         include: { teacher: true, translations: true },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { [sortBy]: sortOrder },
       }),
       this.prisma.teaching.count({ where }),
     ]);
