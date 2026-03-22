@@ -233,14 +233,18 @@ export class DonationsService {
       // 1. Add all actual donations (Manual or Subscription)
       monthlyDonations.forEach(d => {
         const key = `${d.donorName}-${d.currency}`.toLowerCase();
+        // Check if this donor is a subscriber to link their ID/phone etc for admin
+        const sub = activeSubscriptions.find(s => s.name.toLowerCase() === d.donorName.toLowerCase() && s.currency === d.currency);
+
         if (!donorsMap.has(key)) {
           donorsMap.set(key, {
+            ...(sub || {}),
             name: d.donorName,
             amount: d.amount,
             currency: d.currency,
             donationCount: 1,
             paidCurrentMonth: true,
-            isSubscriber: false,
+            isSubscriber: !!sub,
             category: d.category || 'general'
           });
         } else {
@@ -255,6 +259,7 @@ export class DonationsService {
         const key = `${s.name}-${s.currency}`.toLowerCase();
         if (!donorsMap.has(key)) {
           donorsMap.set(key, {
+            ...s,
             name: s.name,
             amount: s.amount,
             currency: s.currency,
@@ -266,6 +271,8 @@ export class DonationsService {
         } else {
           // If already in map because they paid, mark as subscriber
           donorsMap.get(key).isSubscriber = true;
+          // Ensure we have the subscriber's ID and status for management
+          Object.assign(donorsMap.get(key), s);
         }
       });
 
