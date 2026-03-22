@@ -55,7 +55,12 @@ export class DonationsService {
   }
 
   async create(dto: CreateDonationDto) {
-    return this.prisma.donation.create({ data: dto });
+    return this.prisma.donation.create({
+      data: {
+        ...dto,
+        date: dto.date ? new Date(dto.date) : new Date(),
+      },
+    });
   }
 
   async getStats() {

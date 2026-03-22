@@ -18,4 +18,8 @@ export class CreateDonationDto {
   @IsOptional()
   @IsString()
   message?: string;
+
+  @IsOptional()
+  @IsString()
+  date?: string;
 }
