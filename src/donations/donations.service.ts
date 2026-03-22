@@ -245,7 +245,32 @@ export class DonationsService {
       }),
     ]);
 
-    const res = createPaginatedResponse(data, total, page, limit);
+    // Check payment status for current month
+    const now = new Date();
+    const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfCurrentMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+    const monthlyDonations = await this.prisma.donation.findMany({
+      where: {
+        date: {
+          gte: startOfCurrentMonth,
+          lt: endOfCurrentMonth,
+        },
+      },
+      select: { donorName: true },
+    });
+
+    const paidDonorsSet = new Set(monthlyDonations.map(d => d.donorName.toLowerCase()));
+
+    const res = createPaginatedResponse(
+      data.map((d) => ({
+        ...d,
+        paidCurrentMonth: paidDonorsSet.has(d.name.toLowerCase()),
+      })),
+      total,
+      page,
+      limit,
+    );
     return {
       ...res,
       meta: {
