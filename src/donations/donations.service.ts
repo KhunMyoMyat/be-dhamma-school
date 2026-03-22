@@ -264,38 +264,27 @@ export class DonationsService {
         }
       });
 
-      let allData = Array.from(donorsMap.values());
+      // Calculate Totals BEFORE search/pagination
+      const allDataForStats = Array.from(donorsMap.values());
+      const paidTotals: any[] = [];
+      allDataForStats.forEach(d => {
+        if (d.paidCurrentMonth) {
+           let pt = paidTotals.find(t => t.currency === d.currency);
+           if (!pt) { pt = { currency: d.currency, total: 0, count: 0 }; paidTotals.push(pt); }
+           pt.total += d.amount;
+           pt.count += 1;
+        }
+      });
+
+      let allData = allDataForStats;
       // Filter by search if exists
       if (search) {
         allData = allData.filter(d => d.name.toLowerCase().includes(search.toLowerCase()));
       }
 
-      // Sort
+      // Sort & Paginate
       allData.sort((a, b) => b.amount - a.amount);
-      
       const paginatedData = allData.slice(skip, skip + limit);
-
-      // Totals
-      const paidTotals: any[] = [];
-      const expectedTotals: any[] = [];
-
-      allData.forEach(d => {
-        // Paid
-        if (d.paidCurrentMonth) {
-           let pt = paidTotals.find(t => t.currency === d.currency);
-           if (!pt) { pt = { currency: d.currency, total: 0, count: 0 }; paidTotals.push(pt); }
-           pt.total += d.amount;
-        }
-        // Expected from Subscriptions
-        if (d.isSubscriber) {
-           let et = expectedTotals.find(t => t.currency === d.currency);
-           if (!et) { et = { currency: d.currency, total: 0, count: 0 }; expectedTotals.push(et); }
-           // We use the subscription amount for expectation, but we need to check the original MonthlyDonor record
-           // For simplicity in this merged view, we can rely on what's in 'd' if we mapped it correctly
-           // Actually, 'd.amount' for a subscriber who paid might be different from their commitment.
-           // But let's assume they paid the commitment for now.
-        }
-      });
 
       // Better yet, use the groupBy for expected totals
       const expectedTotalsAgg = await this.prisma.monthlyDonor.groupBy({
