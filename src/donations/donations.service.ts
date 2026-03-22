@@ -88,10 +88,17 @@ export class DonationsService {
     } as const;
 
     // Fetch monthly donor commitments that should be active in this month
-    const whereSubscriptions = {
+    const whereSubscriptions: any = {
       startDate: { lt: end },
       status: { in: ['active', 'pending'] },
     };
+
+    // If a donor has an endDate, they must not have ended before this month starts
+    // i.e., endDate >= start
+    whereSubscriptions.OR = [
+      { endDate: null },
+      { endDate: { gte: start } },
+    ];
 
     const [donationGroups, activeSubscriptions, totalsByCurrencyAgg] = await Promise.all([
       this.prisma.donation.groupBy({
@@ -188,6 +195,7 @@ export class DonationsService {
       data: {
         ...dto,
         startDate: new Date(dto.startDate),
+        endDate: dto.endDate ? new Date(dto.endDate) : null,
       },
     });
   }
@@ -196,6 +204,19 @@ export class DonationsService {
     const { page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'desc', category, search: searchRaw } = query;
     const skip = (page - 1) * limit;
     const search = searchRaw?.trim();
+
+    // Auto-expire donors
+    await this.prisma.monthlyDonor.updateMany({
+      where: {
+        status: 'active',
+        endDate: {
+          lt: new Date()
+        }
+      },
+      data: {
+        status: 'inactive'
+      }
+    });
 
     const where: any = {};
     if (search) {
@@ -241,6 +262,11 @@ export class DonationsService {
     const data: any = { ...dto };
     if (dto.startDate) {
       data.startDate = new Date(dto.startDate);
+    }
+    if (dto.endDate) {
+      data.endDate = new Date(dto.endDate);
+    } else if (dto.endDate === null) {
+      data.endDate = null;
     }
     return this.prisma.monthlyDonor.update({
       where: { id },

@@ -140,6 +140,7 @@ model MonthlyDonor {
   currency    String   @default("MMK")
   category    String   @default("general")
   startDate   DateTime @map("start_date")
+  endDate     DateTime? @map("end_date")
   status      String   @default("pending") // pending, active, inactive
   remarks     String?
   createdAt   DateTime @default(now())

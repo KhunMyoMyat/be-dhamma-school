@@ -19,6 +19,10 @@ export class CreateMonthlyDonorDto {
   startDate: string;
 
   @IsOptional()
+  @IsDateString()
+  endDate?: string;
+
+  @IsOptional()
   @IsString()
   category?: string;
 
@@ -55,6 +59,10 @@ export class UpdateMonthlyDonorDto {
   @IsOptional()
   @IsDateString()
   startDate?: string;
+
+  @IsOptional()
+  @IsDateString()
+  endDate?: string;
 
   @IsOptional()
   @IsString()
