@@ -80,52 +80,103 @@ export class DonationsService {
     const start = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0, 0));
     const end = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0));
 
-    const where = {
+    const whereDonations = {
       date: {
         gte: start,
         lt: end,
       },
     } as const;
 
-    const [groups, allGroups, totalsByCurrencyAgg] = await Promise.all([
+    // Fetch monthly donor commitments that should be active in this month
+    const whereSubscriptions = {
+      startDate: { lt: end },
+      status: { in: ['active', 'pending'] },
+    };
+
+    const [donationGroups, activeSubscriptions, totalsByCurrencyAgg] = await Promise.all([
       this.prisma.donation.groupBy({
         by: ['donorName', 'currency'],
-        where,
+        where: whereDonations,
         _sum: { amount: true },
         _count: { _all: true },
         _max: { date: true },
-        orderBy: [{ _sum: { amount: 'desc' } }, { donorName: 'asc' }],
-        skip,
-        take: limit,
       }),
-      this.prisma.donation.groupBy({
-        by: ['donorName', 'currency'],
-        where,
+      this.prisma.monthlyDonor.findMany({
+        where: whereSubscriptions,
       }),
       this.prisma.donation.groupBy({
         by: ['currency'],
-        where,
+        where: whereDonations,
         _sum: { amount: true },
       }),
     ]);
 
-    const data = groups.map((g) => ({
-      donorName: g.donorName,
-      currency: g.currency,
-      totalAmount: g._sum.amount ?? 0,
-      donationCount: g._count._all,
-      lastDonationAt: g._max.date,
+    // Merge logic: Start with actual donations
+    const donorsMap = new Map<string, any>();
+    
+    // 1. Add actual donations to map
+    donationGroups.forEach((g) => {
+      const key = `${g.donorName}-${g.currency}`.toLowerCase();
+      donorsMap.set(key, {
+        donorName: g.donorName,
+        currency: g.currency,
+        totalAmount: g._sum.amount ?? 0,
+        donationCount: g._count._all,
+        lastDonationAt: g._max.date,
+      });
+    });
+
+    // 2. Add commitments from active subscriptions if not already present for this month
+    // Only show commitments for current or future months to avoid cluttering historical data
+    const isFutureOrCurrent = new Date(year, month - 1, 1) >= new Date(now.getFullYear(), now.getMonth(), 1);
+    
+    if (isFutureOrCurrent) {
+      activeSubscriptions.forEach((s) => {
+        const key = `${s.name}-${s.currency}`.toLowerCase();
+        if (!donorsMap.has(key)) {
+          donorsMap.set(key, {
+            donorName: s.name,
+            currency: s.currency,
+            totalAmount: s.amount,
+            donationCount: 0,
+            lastDonationAt: null,
+          });
+        }
+      });
+    }
+
+    const allData = Array.from(donorsMap.values());
+    
+    // Sort by amount descending
+    allData.sort((a, b) => b.totalAmount - a.totalAmount);
+
+    const paginatedData = allData.slice(skip, skip + limit);
+    
+    // Calculate final totals by currency (including commitments for current/future)
+    const finalTotals: { currency: string, total: number }[] = totalsByCurrencyAgg.map(t => ({
+      currency: t.currency,
+      total: t._sum.amount || 0
     }));
 
-    const res = createPaginatedResponse(data, allGroups.length, page, limit);
+    if (isFutureOrCurrent) {
+      allData.forEach(d => {
+        if (d.donationCount === 0) { // It's a commitment
+          const existing = finalTotals.find(t => t.currency === d.currency);
+          if (existing) {
+            existing.total += d.totalAmount;
+          } else {
+            finalTotals.push({ currency: d.currency, total: d.totalAmount });
+          }
+        }
+      });
+    }
+
+    const res = createPaginatedResponse(paginatedData, allData.length, page, limit);
     return {
       ...res,
       meta: {
         ...res.meta,
-        totalsByCurrency: totalsByCurrencyAgg.map(t => ({
-          currency: t.currency,
-          total: t._sum.amount || 0
-        })),
+        totalsByCurrency: finalTotals,
       },
     };
   }
