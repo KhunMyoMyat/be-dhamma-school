@@ -24,6 +24,12 @@ export class ContactController {
   markAsRead(@Param('id') id: string) {
     return this.contactService.markAsRead(id);
   }
+ 
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id/approve')
+  approveSponsorship(@Param('id') id: string) {
+    return this.contactService.approveSponsorship(id);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')

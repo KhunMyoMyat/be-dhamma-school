@@ -85,18 +85,24 @@ export class DonationsService {
     const start = new Date(Date.UTC(year, month - 1, 1, 0, 0, 0, 0));
     const end = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0));
 
-    const whereDonations = {
+    const whereDonations: any = {
       date: {
         gte: start,
         lt: end,
       },
-    } as const;
+    };
+    if (query.category) {
+      whereDonations.category = query.category;
+    }
 
     // Fetch monthly donor commitments that should be active in this month
     const whereSubscriptions: any = {
       startDate: { lt: end },
       status: { in: ['active', 'pending'] },
     };
+    if (query.category) {
+      whereSubscriptions.category = query.category;
+    }
 
     // If a donor has an endDate, they must not have ended before this month starts
     // i.e., endDate >= start
@@ -107,7 +113,7 @@ export class DonationsService {
 
     const [donationGroups, activeSubscriptions, totalsByCurrencyAgg] = await Promise.all([
       this.prisma.donation.groupBy({
-        by: ['donorName', 'currency'],
+        by: ['donorName', 'currency', 'category'],
         where: whereDonations,
         _sum: { amount: true },
         _count: { _all: true },
@@ -128,20 +134,43 @@ export class DonationsService {
     
     // 1. Add actual donations to map
     donationGroups.forEach((g) => {
-      const key = `${g.donorName}-${g.currency}`.toLowerCase();
+      const key = `${g.donorName}-${g.currency}-${g.category}`.toLowerCase();
       donorsMap.set(key, {
         donorName: g.donorName,
         currency: g.currency,
+        category: g.category,
         totalAmount: g._sum.amount ?? 0,
         donationCount: g._count._all,
         lastDonationAt: g._max.date,
       });
     });
 
-    const allData = Array.from(donorsMap.values());
+    let allData = Array.from(donorsMap.values());
     
-    // Sort by amount descending
-    allData.sort((a, b) => b.totalAmount - a.totalAmount);
+    // 2. Search filter
+    if (query.search) {
+      const s = query.search.toLowerCase();
+      allData = allData.filter(d => 
+        d.donorName.toLowerCase().includes(s) || 
+        d.currency.toLowerCase().includes(s)
+      );
+    }
+
+    // 3. Dynamic Sorting
+    const sortBy = query.sortBy || 'totalAmount';
+    const sortOrder = query.sortOrder || 'desc';
+
+    allData.sort((a, b) => {
+      let valA = a[sortBy];
+      let valB = b[sortBy];
+
+      if (typeof valA === 'string') valA = valA.toLowerCase();
+      if (typeof valB === 'string') valB = valB.toLowerCase();
+
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
 
     const paginatedData = allData.slice(skip, skip + limit);
     

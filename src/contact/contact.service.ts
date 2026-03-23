@@ -44,6 +44,54 @@ export class ContactService {
     });
   }
 
+  async approveSponsorship(id: string) {
+    const inquiry = await this.prisma.contactInquiry.findUnique({
+      where: { id },
+      include: { event: true }
+    });
+
+    if (!inquiry || !inquiry.eventId) {
+      throw new Error('Sponsorship inquiry not found or missing event reference.');
+    }
+
+    // Update inquiry status
+    const updated = await this.prisma.contactInquiry.update({
+      where: { id },
+      data: { status: 'approved', isRead: true },
+    });
+
+    // Update event sponsor info based on type
+    if (inquiry.event) {
+      if (inquiry.sponsorType === 'main') {
+        // Set as main sponsor
+        await this.prisma.event.update({
+          where: { id: inquiry.eventId },
+          data: { 
+            mainSponsor: inquiry.name,
+            mainSponsorMm: inquiry.name // Using same name for MM
+          }
+        });
+      } else {
+        // Handle as co-sponsor (default)
+        const currentCoSponsors = Array.isArray(inquiry.event.coSponsors) 
+          ? (inquiry.event.coSponsors as any[]) 
+          : [];
+        
+        const alreadyExists = currentCoSponsors.some(s => s.name === inquiry.name);
+        
+        if (!alreadyExists) {
+          const newCoSponsors = [...currentCoSponsors, { name: inquiry.name, nameMm: inquiry.name }];
+          await this.prisma.event.update({
+            where: { id: inquiry.eventId },
+            data: { coSponsors: newCoSponsors }
+          });
+        }
+      }
+    }
+
+    return updated;
+  }
+
   async remove(id: string) {
     return this.prisma.contactInquiry.delete({ where: { id } });
   }
