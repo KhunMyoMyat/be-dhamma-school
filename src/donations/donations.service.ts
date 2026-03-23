@@ -265,7 +265,10 @@ export class DonationsService {
 
       const [monthlyDonations, activeSubscriptions] = await Promise.all([
         this.prisma.donation.findMany({
-          where: { date: { gte: startOfPeriod, lt: endOfPeriod } },
+          where: { 
+            date: { gte: startOfPeriod, lt: endOfPeriod },
+            status: 'approved' 
+          } as any,
         }),
         this.prisma.monthlyDonor.findMany({
           where: {
@@ -396,7 +399,10 @@ export class DonationsService {
     const startOfCurrent = new Date(now.getFullYear(), now.getMonth(), 1);
     const endOfCurrent = new Date(now.getFullYear(), now.getMonth() + 1, 1);
     const monthlyDonations = await this.prisma.donation.findMany({
-      where: { date: { gte: startOfCurrent, lt: endOfCurrent } },
+      where: { 
+        date: { gte: startOfCurrent, lt: endOfCurrent },
+        status: 'approved'
+      } as any,
       select: { donorName: true }
     });
     const paidNamesSet = new Set(monthlyDonations.map(d => d.donorName.toLowerCase()));
