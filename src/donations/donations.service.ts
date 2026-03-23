@@ -25,6 +25,10 @@ export class DonationsService {
     if (category) {
       where.category = category;
     }
+    // Allow filtering by status, default to all if not provided
+    if ((query as any).status) {
+      where.status = (query as any).status;
+    }
 
     const [data, total, totalsByCurrencyAgg] = await Promise.all([
       this.prisma.donation.findMany({
@@ -64,15 +68,32 @@ export class DonationsService {
   }
 
   async getStats() {
-    const totalDonations = await this.prisma.donation.count();
+    const whereApproved: any = { status: 'approved' };
+    const totalDonations = await this.prisma.donation.count({ where: whereApproved });
     const totalAmount = await this.prisma.donation.aggregate({
+      where: whereApproved,
       _sum: { amount: true },
     });
     return {
       totalDonations,
-      totalAmount: totalAmount._sum.amount || 0,
+      totalAmount: totalAmount._sum?.amount || 0,
     };
   }
+
+  async update(id: string, data: any) {
+    if (data.date) data.date = new Date(data.date);
+    return this.prisma.donation.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async delete(id: string) {
+    return this.prisma.donation.delete({
+      where: { id },
+    });
+  }
+
 
   async getMonthlyDonors(query: MonthlyDonorsQueryDto) {
     const now = new Date();
@@ -90,6 +111,7 @@ export class DonationsService {
         gte: start,
         lt: end,
       },
+      status: 'approved',
     };
     if (query.category) {
       whereDonations.category = query.category;

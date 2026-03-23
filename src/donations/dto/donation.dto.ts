@@ -22,4 +22,12 @@ export class CreateDonationDto {
   @IsOptional()
   @IsString()
   date?: string;
+
+  @IsOptional()
+  @IsString()
+  slipUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  status?: string;
 }

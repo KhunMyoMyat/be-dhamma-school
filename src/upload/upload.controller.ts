@@ -26,7 +26,7 @@ export class UploadController {
         },
       }),
       fileFilter: (_req, file, cb) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp|heic)$/i)) {
           return cb(new Error('Only image files are allowed!'), false);
         }
         cb(null, true);
@@ -35,6 +35,33 @@ export class UploadController {
     }),
   )
   uploadImage(@UploadedFile() file: Express.Multer.File) {
+    return {
+      url: `/uploads/${file.filename}`,
+      filename: file.filename,
+      size: file.size,
+    };
+  }
+
+  @Post('public-image')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: getUploadsRoot(),
+        filename: (_req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-public-' + Math.round(Math.random() * 1e9);
+          cb(null, uniqueSuffix + extname(file.originalname));
+        },
+      }),
+      fileFilter: (_req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp|heic)$/i)) {
+          return cb(new Error('Only image files are allowed!'), false);
+        }
+        cb(null, true);
+      },
+      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    }),
+  )
+  uploadPublicImage(@UploadedFile() file: Express.Multer.File) {
     return {
       url: `/uploads/${file.filename}`,
       filename: file.filename,

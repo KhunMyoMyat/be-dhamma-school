@@ -22,6 +22,18 @@ export class DonationsController {
     return this.donationsService.create(dto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  update(@Param('id') id: string, @Body() data: any) {
+    return this.donationsService.update(id, data);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.donationsService.delete(id);
+  }
+
   @Get('stats')
   getStats() {
     return this.donationsService.getStats();

@@ -126,6 +126,8 @@ model Donation {
   currency  String   @default("MMK")
   category  String   @default("general")
   message   String?
+  slipUrl   String?  @map("slip_url")
+  status    String   @default("approved") // pending, approved, rejected
   date      DateTime @default(now())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
