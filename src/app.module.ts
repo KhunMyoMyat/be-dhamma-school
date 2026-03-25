@@ -11,6 +11,7 @@ import { TeachingsModule } from './teachings/teachings.module';
 import { DonationsModule } from './donations/donations.module';
 import { ContactModule } from './contact/contact.module';
 import { UploadModule } from './upload/upload.module';
+import { EnrollmentsModule } from './enrollments/enrollments.module';
 
 function getUploadsRoot() {
   const candidate = join(__dirname, '..', 'uploads');
@@ -34,6 +35,7 @@ function getUploadsRoot() {
     DonationsModule,
     ContactModule,
     UploadModule,
+    EnrollmentsModule,
   ],
 })
 export class AppModule {}
