@@ -1,4 +1,5 @@
-import { IsString, IsOptional, IsBoolean, IsDateString, IsArray, IsInt, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsDateString, IsArray, IsInt, IsEnum, IsNumber } from 'class-validator';
+import { CourseType } from '@prisma/client';
 
 export class CreateCourseDto {
   @IsString()
@@ -14,6 +15,14 @@ export class CreateCourseDto {
   @IsOptional()
   @IsString()
   descriptionMm?: string;
+
+  @IsOptional()
+  @IsEnum(CourseType)
+  type?: CourseType;
+
+  @IsOptional()
+  @IsString()
+  videoUrl?: string;
 
   @IsOptional()
   @IsString()
@@ -73,6 +82,14 @@ export class UpdateCourseDto {
   @IsOptional()
   @IsString()
   descriptionMm?: string;
+
+  @IsOptional()
+  @IsEnum(CourseType)
+  type?: CourseType;
+
+  @IsOptional()
+  @IsString()
+  videoUrl?: string;
 
   @IsOptional()
   @IsString()

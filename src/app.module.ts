@@ -13,6 +13,8 @@ import { ContactModule } from './contact/contact.module';
 import { UploadModule } from './upload/upload.module';
 import { EnrollmentsModule } from './enrollments/enrollments.module';
 
+import { AppController } from './app.controller';
+
 function getUploadsRoot() {
   const candidate = join(__dirname, '..', 'uploads');
   if (existsSync(candidate)) return candidate;
@@ -21,6 +23,7 @@ function getUploadsRoot() {
 }
 
 @Module({
+  controllers: [AppController],
   imports: [
     ServeStaticModule.forRoot({
       rootPath: getUploadsRoot(),

@@ -19,26 +19,37 @@ model User {
   @@map("users")
 }
 
+enum Role {
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum CourseType {
+  VIDEO
+}
+
 model Course {
-  id            String   @id @default(uuid())
+  id            String      @id @default(uuid())
   title         String
-  titleMm       String?  @map("title_mm")
+  titleMm       String?     @map("title_mm")
   description   String
-  descriptionMm String?  @map("description_mm")
+  descriptionMm String?     @map("description_mm")
+  type          CourseType  @default(VIDEO)
+  videoUrl      String?     @map("video_url")
   image         String?
-  level         String   @default("beginner")
+  level         String      @default("beginner")
   duration      String?
-  daysOfWeek    String[] @default([]) @map("days_of_week")
-  classTime     String?  @map("class_time")
-  daysPerWeek   Int?     @map("days_per_week")
+  daysOfWeek    String[]    @default([]) @map("days_of_week")
+  classTime     String?     @map("class_time")
+  daysPerWeek   Int?        @map("days_per_week")
   schedule      String?
-  teacherId     String?  @map("teacher_id")
-  teacher       Teacher? @relation(fields: [teacherId], references: [id])
-  startDate     DateTime? @map("start_date")
-  isActive      Boolean  @default(true) @map("is_active")
+  teacherId     String?     @map("teacher_id")
+  teacher       Teacher?    @relation(fields: [teacherId], references: [id])
+  startDate     DateTime?   @map("start_date")
+  isActive      Boolean     @default(true) @map("is_active")
   enrollments   Enrollment[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
   @@map("courses")
 }
@@ -168,11 +179,6 @@ model ContactInquiry {
   updatedAt DateTime @updatedAt
 
   @@map("contact_inquiries")
-}
-
-enum Role {
-  ADMIN
-  SUPER_ADMIN
 }
 
 model Enrollment {
