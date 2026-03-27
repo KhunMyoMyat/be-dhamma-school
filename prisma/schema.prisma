@@ -24,35 +24,6 @@ enum Role {
   SUPER_ADMIN
 }
 
-enum CourseType {
-  VIDEO
-}
-
-model Course {
-  id            String      @id @default(uuid())
-  title         String
-  titleMm       String?     @map("title_mm")
-  description   String
-  descriptionMm String?     @map("description_mm")
-  type          CourseType  @default(VIDEO)
-  videoUrl      String?     @map("video_url")
-  image         String?
-  level         String      @default("beginner")
-  duration      String?
-  daysOfWeek    String[]    @default([]) @map("days_of_week")
-  classTime     String?     @map("class_time")
-  daysPerWeek   Int?        @map("days_per_week")
-  schedule      String?
-  teacherId     String?     @map("teacher_id")
-  teacher       Teacher?    @relation(fields: [teacherId], references: [id])
-  startDate     DateTime?   @map("start_date")
-  isActive      Boolean     @default(true) @map("is_active")
-  enrollments   Enrollment[]
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  @@map("courses")
-}
 
 model Teacher {
   id        String     @id @default(uuid())
@@ -62,7 +33,6 @@ model Teacher {
   bioMm     String?    @map("bio_mm")
   image     String?
   title     String?
-  courses   Course[]
   teachings Teaching[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
@@ -71,46 +41,46 @@ model Teacher {
 }
 
 model Event {
-  id            String    @id @default(uuid())
+  id            String           @id @default(uuid())
   title         String
-  titleMm       String?   @map("title_mm")
+  titleMm       String?          @map("title_mm")
   description   String?
-  descriptionMm String?   @map("description_mm")
+  descriptionMm String?          @map("description_mm")
   date          DateTime
-  endDate       DateTime? @map("end_date")
+  endDate       DateTime?        @map("end_date")
   location      String?
   image         String?
-  mainSponsor   String?   @map("main_sponsor")
-  mainSponsorMm String?   @map("main_sponsor_mm")
-  coSponsors    Json?     @map("co_sponsors") // Array of { name: string, nameMm: string }
-  isActive      Boolean   @default(true) @map("is_active")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  mainSponsor   String?          @map("main_sponsor")
+  mainSponsorMm String?          @map("main_sponsor_mm")
+  coSponsors    Json?            @map("co_sponsors") // Array of { name: string, nameMm: string }
+  isActive      Boolean          @default(true) @map("is_active")
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
   inquiries     ContactInquiry[]
 
   @@map("events")
 }
 
 model Teaching {
-  id          String   @id @default(uuid())
-  title       String?
-  titleMm     String?  @map("title_mm")
-  content     String?
-  contentMm   String?  @map("content_mm")
-  category    String   @default("dhamma")
-  coverImageUrl String? @map("cover_image_url")
-  audioUrl    String?  @map("audio_url")
-  videoUrl    String?  @map("video_url")
-  documentUrl  String? @map("document_url")
-  documentName String? @map("document_name")
-  documentType String? @map("document_type")
-  documentSize Int?    @map("document_size")
-  teacherId   String?  @map("teacher_id")
-  teacher     Teacher? @relation(fields: [teacherId], references: [id])
-  translations TeachingTranslation[]
-  isPublished Boolean  @default(true) @map("is_published")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String                @id @default(uuid())
+  title         String?
+  titleMm       String?               @map("title_mm")
+  content       String?
+  contentMm     String?               @map("content_mm")
+  category      String                @default("dhamma")
+  coverImageUrl String?               @map("cover_image_url")
+  audioUrl      String?               @map("audio_url")
+  videoUrl      String?               @map("video_url")
+  documentUrl   String?               @map("document_url")
+  documentName  String?               @map("document_name")
+  documentType  String?               @map("document_type")
+  documentSize  Int?                  @map("document_size")
+  teacherId     String?               @map("teacher_id")
+  teacher       Teacher?              @relation(fields: [teacherId], references: [id])
+  translations  TeachingTranslation[]
+  isPublished   Boolean               @default(true) @map("is_published")
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
 
   @@map("teachings")
 }
@@ -124,7 +94,7 @@ model TeachingTranslation {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  teaching   Teaching @relation(fields: [teachingId], references: [id], onDelete: Cascade)
+  teaching Teaching @relation(fields: [teachingId], references: [id], onDelete: Cascade)
 
   @@unique([teachingId, locale])
   @@index([locale])
@@ -148,49 +118,35 @@ model Donation {
 }
 
 model MonthlyDonor {
-  id          String   @id @default(uuid())
-  name        String
-  phone       String?
-  amount      Float
-  currency    String   @default("MMK")
-  category    String   @default("general")
-  startDate   DateTime @map("start_date")
-  endDate     DateTime? @map("end_date")
-  status      String   @default("pending") // pending, active, inactive
-  remarks     String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String    @id @default(uuid())
+  name      String
+  phone     String?
+  amount    Float
+  currency  String    @default("MMK")
+  category  String    @default("general")
+  startDate DateTime  @map("start_date")
+  endDate   DateTime? @map("end_date")
+  status    String    @default("pending") // pending, active, inactive
+  remarks   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@map("monthly_donors")
 }
 
 model ContactInquiry {
-  id        String   @id @default(uuid())
-  name      String
-  email     String?
-  subject   String
-  message   String
-  isRead    Boolean  @default(false) @map("is_read")
-  status    String   @default("pending") // pending, approved, rejected
-  sponsorType String? @map("sponsor_type") // main, co_sponsor
-  eventId   String?  @map("event_id")
-  event     Event?   @relation(fields: [eventId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(uuid())
+  name        String
+  email       String?
+  subject     String
+  message     String
+  isRead      Boolean  @default(false) @map("is_read")
+  status      String   @default("pending") // pending, approved, rejected
+  sponsorType String?  @map("sponsor_type") // main, co_sponsor
+  eventId     String?  @map("event_id")
+  event       Event?   @relation(fields: [eventId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@map("contact_inquiries")
-}
-
-model Enrollment {
-  id        String   @id @default(uuid())
-  courseId  String   @map("course_id")
-  course    Course   @relation(fields: [courseId], references: [id])
-  name      String
-  email     String?
-  phone     String
-  status    String   @default("pending") // pending, approved, rejected
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("enrollments")
 }

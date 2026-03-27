@@ -25,7 +25,7 @@ export class TeachersService {
         where,
         skip,
         take: limit,
-        include: { courses: true },
+        include: { teachings: true },
         orderBy: { createdAt: 'desc' },
       }),
       this.prisma.teacher.count({ where }),
@@ -37,7 +37,7 @@ export class TeachersService {
   async findOne(id: string) {
     return this.prisma.teacher.findUnique({
       where: { id },
-      include: { courses: true, teachings: true },
+      include: { teachings: true },
     });
   }
 

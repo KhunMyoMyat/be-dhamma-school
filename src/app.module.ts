@@ -4,14 +4,12 @@ import { join } from 'path';
 import { existsSync } from 'fs';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
-import { CoursesModule } from './courses/courses.module';
 import { TeachersModule } from './teachers/teachers.module';
 import { EventsModule } from './events/events.module';
 import { TeachingsModule } from './teachings/teachings.module';
 import { DonationsModule } from './donations/donations.module';
 import { ContactModule } from './contact/contact.module';
 import { UploadModule } from './upload/upload.module';
-import { EnrollmentsModule } from './enrollments/enrollments.module';
 
 import { AppController } from './app.controller';
 
@@ -31,14 +29,12 @@ function getUploadsRoot() {
     }),
     PrismaModule,
     AuthModule,
-    CoursesModule,
     TeachersModule,
     EventsModule,
     TeachingsModule,
     DonationsModule,
     ContactModule,
     UploadModule,
-    EnrollmentsModule,
   ],
 })
 export class AppModule {}

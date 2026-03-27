@@ -9,7 +9,6 @@ async function main() {
   // Clear existing data
   await prisma.donation.deleteMany();
   await prisma.teaching.deleteMany();
-  await prisma.course.deleteMany();
   await prisma.event.deleteMany();
   await prisma.teacher.deleteMany();
   await prisma.contactInquiry.deleteMany();
@@ -66,77 +65,7 @@ async function main() {
     },
   });
 
-  // Create courses
-  await prisma.course.createMany({
-    data: [
-      {
-        title: 'Introduction to Vipassana Meditation',
-        titleMm: 'ဝိပဿနာ တရားထိုင်ခြင်း မိတ်ဆက်',
-        description: 'Learn the foundational techniques of Vipassana meditation as taught in the Theravada Buddhist tradition. This course covers basic sitting posture, breathing techniques, and mindfulness practices suitable for beginners.',
-        descriptionMm: 'ထေရဝါဒ ဗုဒ္ဓဘာသာ ထုံးတမ်းအရ သင်ကြားသော ဝိပဿနာတရားထိုင်ခြင်း၏ အခြေခံနည်းစနစ်များကို လေ့လာပါ။',
-        level: 'beginner',
-        duration: '8 weeks',
-        schedule: 'Every Saturday 6:00 AM - 8:00 AM',
-        teacherId: teacher1.id,
-        image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=1000',
-      },
-      {
-        title: 'Abhidhamma Studies - Level 1',
-        titleMm: 'အဘိဓမ္မာ ပထမဆင့်',
-        description: 'A comprehensive introduction to Abhidhamma, the higher teaching of the Buddha. Study the nature of consciousness, mental factors, and the ultimate realities as described in the Abhidhamma Pitaka.',
-        descriptionMm: 'ဗုဒ္ဓ၏ အထက်တန်းသင်ကြားချက် ဖြစ်သော အဘိဓမ္မာ၏ ပြည့်စုံသော မိတ်ဆက်ချက်ဖြစ်ပါသည်။',
-        level: 'intermediate',
-        duration: '12 weeks',
-        schedule: 'Every Sunday 9:00 AM - 11:00 AM',
-        teacherId: teacher2.id,
-        image: 'https://images.unsplash.com/photo-1533519107127-143d4f3fed18?q=80&w=1000',
-      },
-      {
-        title: 'Pali Language for Beginners',
-        titleMm: 'ပါဠိဘာသာ အခြေခံ',
-        description: 'Learn the sacred language of Theravada Buddhism. This course teaches reading, writing, and basic grammar of Pali, enabling students to read original Buddhist texts.',
-        descriptionMm: 'ထေရဝါဒ ဗုဒ္ဓဘာသာ၏ မြင့်မြတ်သော ဘာသာစကားကို လေ့လာပါ။',
-        level: 'beginner',
-        duration: '16 weeks',
-        schedule: 'Every Wednesday 5:00 PM - 7:00 PM',
-        teacherId: teacher2.id,
-        image: 'https://images.unsplash.com/photo-1590059235ef9-7be853ec039f?q=80&w=1000',
-      },
-      {
-        title: 'Buddhist Ethics in Modern Life',
-        titleMm: 'ခေတ်သစ်ဘဝတွင် ဗုဒ္ဓကျင့်ဝတ်',
-        description: 'Explore how the Five Precepts and Buddhist moral codes apply to contemporary challenges. Topics include digital ethics, environmental responsibility, and mindful leadership.',
-        descriptionMm: 'ပဉ္စသီလနှင့် ဗုဒ္ဓကျင့်ဝတ်စည်းကမ်းများ ခေတ်သစ်စိန်ခေါ်မှုများနှင့် မည်ကဲ့သို့ သက်ဆိုင်ကြောင်း လေ့လာပါ။',
-        level: 'beginner',
-        duration: '6 weeks',
-        schedule: 'Every Friday 6:00 PM - 7:30 PM',
-        teacherId: teacher3.id,
-        image: 'https://images.unsplash.com/photo-1507692049790-de58290a4334?q=80&w=1000',
-      },
-      {
-        title: 'Advanced Meditation Retreat Preparation',
-        titleMm: 'အဆင့်မြင့် တရားစခန်း ပြင်ဆင်မှု',
-        description: 'Intensive preparation for long meditation retreats. Learn advanced meditation techniques, proper retreat conduct, and how to deepen your practice over extended periods.',
-        descriptionMm: 'ရက်ရှည်တရားစခန်းများအတွက် ပြင်းထန်သော ပြင်ဆင်မှုဖြစ်ပါသည်။',
-        level: 'advanced',
-        duration: '4 weeks',
-        schedule: 'Every Saturday 4:00 AM - 7:00 AM',
-        teacherId: teacher1.id,
-        image: 'https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?q=80&w=1000',
-      },
-      {
-        title: 'Sutta Study Circle',
-        titleMm: 'သုတ္တန်းစာဖတ်ဝိုင်း',
-        description: 'Weekly study and discussion of important Suttas from the Tipitaka. Each session focuses on a different discourse, exploring its meaning and practical applications.',
-        descriptionMm: 'တိပိဋကမှ အရေးကြီးသော သုတ္တန်းများကို အပတ်စဉ် လေ့လာ ဆွေးနွေးခြင်း ဖြစ်ပါသည်။',
-        level: 'intermediate',
-        duration: 'Ongoing',
-        schedule: 'Every Thursday 6:00 PM - 8:00 PM',
-        teacherId: teacher3.id,
-        image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1000',
-      },
-    ],
-  });
+
 
   // Create events
   const now = new Date();
