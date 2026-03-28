@@ -14,13 +14,13 @@ export class TeachingsController {
   }
 
   @Get('published')
-  findPublished() {
-    return this.teachingsService.findPublished();
+  findPublished(@Query() query: PaginationDto) {
+    return this.teachingsService.findPublished(query);
   }
 
   @Get('category/:category')
-  findByCategory(@Param('category') category: string) {
-    return this.teachingsService.findByCategory(category);
+  findByCategory(@Param('category') category: string, @Query() query: PaginationDto) {
+    return this.teachingsService.findByCategory(category, query);
   }
 
   @Get(':id')

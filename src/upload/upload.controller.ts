@@ -4,6 +4,7 @@ import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { existsSync } from 'fs';
+import { UploadService } from './upload.service';
 
 function getUploadsRoot() {
   const candidate = join(__dirname, '..', '..', 'uploads');
@@ -14,6 +15,8 @@ function getUploadsRoot() {
 
 @Controller('upload')
 export class UploadController {
+  constructor(private readonly uploadService: UploadService) {}
+
   @UseGuards(JwtAuthGuard)
   @Post('image')
   @UseInterceptors(
@@ -34,7 +37,8 @@ export class UploadController {
       limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
     }),
   )
-  uploadImage(@UploadedFile() file: Express.Multer.File) {
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+    await this.uploadService.processImage(file);
     return {
       url: `/uploads/${file.filename}`,
       filename: file.filename,
@@ -61,7 +65,8 @@ export class UploadController {
       limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
     }),
   )
-  uploadPublicImage(@UploadedFile() file: Express.Multer.File) {
+  async uploadPublicImage(@UploadedFile() file: Express.Multer.File) {
+    await this.uploadService.processImage(file);
     return {
       url: `/uploads/${file.filename}`,
       filename: file.filename,

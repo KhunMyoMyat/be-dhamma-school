@@ -59,6 +59,8 @@ model Event {
   inquiries     ContactInquiry[]
 
   @@map("events")
+  @@index([date])
+  @@index([isActive])
 }
 
 model Teaching {
@@ -83,6 +85,9 @@ model Teaching {
   updatedAt     DateTime              @updatedAt
 
   @@map("teachings")
+  @@index([category])
+  @@index([isPublished])
+  @@index([createdAt])
 }
 
 model TeachingTranslation {
@@ -115,6 +120,9 @@ model Donation {
   updatedAt DateTime @updatedAt
 
   @@map("donations")
+  @@index([status])
+  @@index([category])
+  @@index([createdAt])
 }
 
 model MonthlyDonor {
@@ -132,6 +140,8 @@ model MonthlyDonor {
   updatedAt DateTime  @updatedAt
 
   @@map("monthly_donors")
+  @@index([status])
+  @@index([category])
 }
 
 model ContactInquiry {
@@ -162,5 +172,8 @@ model Lesson {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("lessons")
+  @@index([category])
+  @@index([published])
+  @@index([createdAt])
 }
 

@@ -38,20 +38,40 @@ export class TeachingsService {
     return createPaginatedResponse(data, total, page, limit);
   }
 
-  async findPublished() {
-    return this.prisma.teaching.findMany({
-      where: { isPublished: true },
-      include: { teacher: true, translations: true },
-      orderBy: { createdAt: 'desc' },
-    });
+  async findPublished(query: PaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.prisma.teaching.findMany({
+        where: { isPublished: true },
+        skip,
+        take: limit,
+        include: { teacher: true, translations: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.teaching.count({ where: { isPublished: true } }),
+    ]);
+
+    return createPaginatedResponse(data, total, page, limit);
   }
 
-  async findByCategory(category: string) {
-    return this.prisma.teaching.findMany({
-      where: { category, isPublished: true },
-      include: { teacher: true, translations: true },
-      orderBy: { createdAt: 'desc' },
-    });
+  async findByCategory(category: string, query: PaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.prisma.teaching.findMany({
+        where: { category, isPublished: true },
+        skip,
+        take: limit,
+        include: { teacher: true, translations: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.teaching.count({ where: { category, isPublished: true } }),
+    ]);
+
+    return createPaginatedResponse(data, total, page, limit);
   }
 
   async findOne(id: string) {
