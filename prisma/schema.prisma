@@ -150,3 +150,17 @@ model ContactInquiry {
 
   @@map("contact_inquiries")
 }
+
+model Lesson {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  youtubeId   String   @map("youtube_id")
+  category    String
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("lessons")
+}
+

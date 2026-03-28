@@ -10,6 +10,7 @@ import { TeachingsModule } from './teachings/teachings.module';
 import { DonationsModule } from './donations/donations.module';
 import { ContactModule } from './contact/contact.module';
 import { UploadModule } from './upload/upload.module';
+import { LessonsModule } from './lessons/lessons.module';
 
 import { AppController } from './app.controller';
 
@@ -35,6 +36,7 @@ function getUploadsRoot() {
     DonationsModule,
     ContactModule,
     UploadModule,
+    LessonsModule,
   ],
 })
 export class AppModule {}
