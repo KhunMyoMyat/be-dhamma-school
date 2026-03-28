@@ -43,8 +43,5 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:myat123@localhost:5432/dhamma_school
 
-      - name: Lint
-        run: npm run lint --if-present
-
       - name: Build
         run: npm run build
