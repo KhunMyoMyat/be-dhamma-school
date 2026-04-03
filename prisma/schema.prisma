@@ -65,10 +65,6 @@ model Event {
 
 model Teaching {
   id            String                @id @default(uuid())
-  title         String?
-  titleMm       String?               @map("title_mm")
-  content       String?
-  contentMm     String?               @map("content_mm")
   category      String                @default("dhamma")
   coverImageUrl String?               @map("cover_image_url")
   audioUrl      String?               @map("audio_url")
