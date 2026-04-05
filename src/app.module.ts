@@ -25,12 +25,12 @@ function getUploadsRoot() {
 @Module({
   controllers: [AppController],
   imports: [
-    ServeStaticModule.forRoot({
+    ServeStaticModule.forRoot({ 
       rootPath: getUploadsRoot(),
       serveRoot: '/uploads',
     }),
     ThrottlerModule.forRoot([{
-      ttl: 60000,
+      ttl: 60000, 
       limit: 10,
     }]),
     PrismaModule,
