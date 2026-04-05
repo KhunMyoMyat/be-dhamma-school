@@ -112,50 +112,62 @@ async function main() {
   });
 
   // Create teachings
-  await prisma.teaching.createMany({
-    data: [
-      {
-        title: 'The Four Noble Truths',
-        titleMm: 'သစ္စာလေးပါး',
-        content: 'The Four Noble Truths are the central teaching of the Buddha. They describe the nature of suffering, its cause, its cessation, and the path leading to its cessation. Understanding these truths is essential for any Buddhist practitioner.',
-        contentMm: 'သစ္စာလေးပါးသည် ဗုဒ္ဓ၏ အဓိက သင်ကြားချက်ဖြစ်ပါသည်။ ဒုက္ခ၏ သဘာဝ၊ ဒုက္ခဖြစ်ကြောင်း၊ ဒုက္ခချုပ်ခြင်း နှင့် ဒုက္ခချုပ်ရာ လမ်းစဉ်တို့ကို ဖော်ပြပါသည်။',
-        category: 'dhamma',
-        teacherId: teacher1.id,
+  const teachingsData = [
+    {
+      translations: {
+        create: [
+          { locale: 'en', title: 'The Four Noble Truths', content: 'The Four Noble Truths are the central teaching of the Buddha...' },
+          { locale: 'mm', title: 'သစ္စာလေးပါး', content: 'သစ္စာလေးပါးသည် ဗုဒ္ဓ၏ အဓိက သင်ကြားချက်ဖြစ်ပါသည်။...' }
+        ]
       },
-      {
-        title: 'The Noble Eightfold Path',
-        titleMm: 'မဂ္ဂင်ရှစ်ပါး',
-        content: 'The Noble Eightfold Path is the practical guideline to end suffering. It encompasses Right View, Right Intention, Right Speech, Right Action, Right Livelihood, Right Effort, Right Mindfulness, and Right Concentration.',
-        contentMm: 'မဂ္ဂင်ရှစ်ပါးသည် ဒုက္ခချုပ်ရန် လက်တွေ့ကျင့်စဉ်လမ်းညွှန်ဖြစ်ပါသည်။',
-        category: 'dhamma',
-        teacherId: teacher1.id,
+      category: 'dhamma',
+      teacherId: teacher1.id,
+    },
+    {
+      translations: {
+        create: [
+          { locale: 'en', title: 'The Noble Eightfold Path', content: 'The Noble Eightfold Path is the practical guideline to end suffering...' },
+          { locale: 'mm', title: 'မဂ္ဂင်ရှစ်ပါး', content: 'မဂ္ဂင်ရှစ်ပါးသည် ဒုက္ခချုပ်ရန် လက်တွေ့ကျင့်စဉ်လမ်းညွှန်ဖြစ်ပါသည်။' }
+        ]
       },
-      {
-        title: 'Understanding Kamma',
-        titleMm: 'ကံ ကို နားလည်ခြင်း',
-        content: 'Kamma (Sanskrit: Karma) is the law of moral causation. Every intentional action creates consequences that shape our future experiences. Learn how understanding kamma can transform your daily decisions.',
-        contentMm: 'ကံသည် ကုသိုလ်နှင့် အကုသိုလ်ကြောင်း ဆက်စပ်ခြင်း ဥပဒေဖြစ်ပါသည်။',
-        category: 'dhamma',
-        teacherId: teacher3.id,
+      category: 'dhamma',
+      teacherId: teacher1.id,
+    },
+    {
+      translations: {
+        create: [
+          { locale: 'en', title: 'Understanding Kamma', content: 'Kamma (Sanskrit: Karma) is the law of moral causation...' },
+          { locale: 'mm', title: 'ကံ ကို နားလည်ခြင်း', content: 'ကံသည် ကုသိုလ်နှင့် အကုသိုလ်ကြောင်း ဆက်စပ်ခြင်း ဥပဒေဖြစ်ပါသည်။' }
+        ]
       },
-      {
-        title: 'Introduction to Mindfulness (Satipatthana)',
-        titleMm: 'သတိပဋ္ဌာန် မိတ်ဆက်',
-        content: 'The Satipatthana Sutta outlines the four foundations of mindfulness: contemplation of body, feelings, mind, and mental objects. This teaching is the direct path to the realization of Nibbana.',
-        contentMm: 'သတိပဋ္ဌာန်သုတ်သည် သတိထားခြင်း၏ အခြေခံလေးပါးကို ဖော်ပြပါသည်။',
-        category: 'meditation',
-        teacherId: teacher1.id,
+      category: 'dhamma',
+      teacherId: teacher3.id,
+    },
+    {
+      translations: {
+        create: [
+          { locale: 'en', title: 'Introduction to Mindfulness (Satipatthana)', content: 'The Satipatthana Sutta outlines the four foundations of mindfulness...' },
+          { locale: 'mm', title: 'သတိပဋ္ဌာန် မိတ်ဆက်', content: 'သတိပဋ္ဌာန်သုတ်သည် သတိထားခြင်း၏ အခြေခံလေးပါးကို ဖော်ပြပါသည်။' }
+        ]
       },
-      {
-        title: 'The Five Precepts',
-        titleMm: 'ပဉ္စသီလ',
-        content: 'The Five Precepts form the foundation of Buddhist ethics. They are: refraining from killing, stealing, sexual misconduct, false speech, and intoxicants. These are not commandments but voluntary commitments to ethical conduct.',
-        contentMm: 'ပဉ္စသီလသည် ဗုဒ္ဓကျင့်ဝတ်များ၏ အခြေခံဖြစ်ပါသည်။',
-        category: 'sila',
-        teacherId: teacher3.id,
+      category: 'meditation',
+      teacherId: teacher1.id,
+    },
+    {
+      translations: {
+        create: [
+          { locale: 'en', title: 'The Five Precepts', content: 'The Five Precepts form the foundation of Buddhist ethics...' },
+          { locale: 'mm', title: 'ပဉ္စသီလ', content: 'ပဉ္စသီလသည် ဗုဒ္ဓကျင့်ဝတ်များ၏ အခြေခံဖြစ်ပါသည်။' }
+        ]
       },
-    ],
-  });
+      category: 'sila',
+      teacherId: teacher3.id,
+    },
+  ];
+
+  for (const data of teachingsData) {
+    await prisma.teaching.create({ data });
+  }
 
   console.log('✅ Seed data created successfully!');
 }
